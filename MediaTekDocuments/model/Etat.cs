@@ -15,5 +15,13 @@ namespace MediaTekDocuments.model
             this.Libelle = libelle;
         }
 
+        /// <summary>
+        /// Récupération du libellé pour l'affichage dans les combos
+        /// </summary>
+        /// <returns>Libelle</returns>
+        public override string ToString()
+        {
+            return this.Libelle;
+        }
     }
 }

@@ -95,6 +95,10 @@ namespace MediaTekDocuments.dal
             return new List<Categorie>(lesRayons);
         }
 
+        /// <summary>
+        /// Retourne tous les suivis à partir de la BDD
+        /// </summary>
+        /// <returns></returns>
         public List<Suivi> GetAllSuivis()
         {
             IEnumerable<Suivi> LesSuivis = TraitementRecup<Suivi>(GET, "suivi");
@@ -109,6 +113,16 @@ namespace MediaTekDocuments.dal
         {
             IEnumerable<Public> lesPublics = TraitementRecup<Public>(GET, "public");
             return new List<Categorie>(lesPublics);
+        }
+
+        /// <summary>
+        /// Retourne tous les etats à partir de la BDD
+        /// </summary>
+        /// <returns></returns>
+        public List<Etat> GetAllEtats()
+        {
+            IEnumerable<Etat> lesEtats = TraitementRecup<Etat>(GET, "etat");
+            return new List<Etat>(lesEtats);
         }
 
         /// <summary>
@@ -128,7 +142,6 @@ namespace MediaTekDocuments.dal
         /// <returns></returns>
         public bool CreerEntite(string type, String jsonEntite)
         {
-            //jsonEntite = jsonEntite.Replace(' ', '-');
             try
             {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
@@ -150,7 +163,6 @@ namespace MediaTekDocuments.dal
         /// <returns></returns>
         public bool UpdateEntite(string type, string id, String jsonEntite)
         {
-            //jsonEntite = jsonEntite.Replace(' ', '-');
             try
             {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
