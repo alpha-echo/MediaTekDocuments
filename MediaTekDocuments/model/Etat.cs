@@ -6,8 +6,8 @@ namespace MediaTekDocuments.model
     /// </summary>
     public class Etat
     {
-        public string Id { get; set; }
-        public string Libelle { get; set; }
+        public string Id { get; }
+        public string Libelle { get; }
 
         public Etat(string id, string libelle)
         {

@@ -43,7 +43,6 @@ namespace MediaTekDocuments.dal
         /// </summary>
         private const string DELETE = "DELETE";
 
-
         /// <summary>
         /// Méthode privée pour créer un singleton
         /// initialise l'accès à l'API
@@ -69,7 +68,7 @@ namespace MediaTekDocuments.dal
         /// <returns>instance unique de la classe</returns>
         public static Access GetInstance()
         {
-            if (instance == null)
+            if(instance == null)
             {
                 instance = new Access();
             }
@@ -96,6 +95,12 @@ namespace MediaTekDocuments.dal
             return new List<Categorie>(lesRayons);
         }
 
+        public List<Suivi> GetAllSuivis()
+        {
+            IEnumerable<Suivi> LesSuivis = TraitementRecup<Suivi>(GET, "suivi");
+            return new List<Suivi>(LesSuivis);
+        }
+
         /// <summary>
         /// Retourne toutes les catégories de public à partir de la BDD
         /// </summary>
@@ -117,17 +122,17 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
-        /// Créer un document dans la BDD, return true si l'opération, c'est correctement déroulé
+        /// Créer une entite dans la BDD, return true si l'opération, c'est correctement déroulé
         /// </summary>
-        /// <param name="jsonDocument"></param>
+        /// <param name="jsonEntite"></param>
         /// <returns></returns>
-        public bool CreerDocument(String jsonDocument)
+        public bool CreerEntite(string type, String jsonEntite)
         {
-            jsonDocument = jsonDocument.Replace(' ', '-');  // <- xD c'est tres moche les espaces qui passent pas avec les regex dans champs
+            //jsonEntite = jsonEntite.Replace(' ', '-');
             try
             {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(POST, "document/" + jsonDocument);
+                List<Object> liste = TraitementRecup<Object>(POST, type + "/" + jsonEntite);
                 return (liste != null);
             }
             catch (Exception ex)
@@ -138,18 +143,18 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
-        /// Modifie un document dans la BDD, return true si l'opération, c'est correctement déroulé
+        /// Modifie une entite dans la BDD, return true si l'opération, c'est correctement déroulé
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="jsonDocument"></param>
+        /// <param name="jsonEntite"></param>
         /// <returns></returns>
-        public bool UpdateDocument(string id, String jsonDocument)
+        public bool UpdateEntite(string type, string id, String jsonEntite)
         {
-            jsonDocument = jsonDocument.Replace(' ', '-');
+            //jsonEntite = jsonEntite.Replace(' ', '-');
             try
             {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(PUT, "document/" + id + "/" + jsonDocument);
+                List<Object> liste = TraitementRecup<Object>(PUT, type + "/" + id + "/" + jsonEntite);
                 return (liste != null);
             }
             catch (Exception ex)
@@ -160,250 +165,16 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
-        /// Supprime un document dans la BDD, return true si l'opération, c'est correctement déroulé
+        /// Supprime une entité dans la BDD, return true si l'opération, c'est correctement déroulé
         /// </summary>
-        /// <param name="jsonDocument"></param>
+        /// <param name="jsonEntite"></param>
         /// <returns></returns>
-        public bool SupprimerDocument(String jsonDocument)
-        {
-            jsonDocument = jsonDocument.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(DELETE, "document/" + jsonDocument);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Créer un livre_dvd dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonLivreDvd"></param>
-        /// <returns></returns>
-        public bool CreerLivreDvd(String jsonLivreDvd)
+        public bool SupprimerEntite(string type, String jsonEntite)
         {
             try
             {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(POST, "livres_dvd/" + jsonLivreDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Supprime un livre_dvd dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonLivreDvd"></param>
-        /// <returns></returns>
-        public bool SupprimerLivreDvD(String jsonLivreDvd)
-        {
-            jsonLivreDvd = jsonLivreDvd.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(DELETE, "livres_dvd/" + jsonLivreDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Créer un livre dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonLivre"></param>
-        /// <returns></returns>
-        public bool CreerLivre(String jsonLivre)
-        {
-            jsonLivre = jsonLivre.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(POST, "livre/" + jsonLivre);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Modifie un livre dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="jsonLivre"></param>
-        /// <returns></returns>
-        public bool UpdateLivre(string id, String jsonLivre)
-        {
-            jsonLivre = jsonLivre.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(PUT, "livre/" + id + "/" + jsonLivre);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Supprime un livre dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonLivreDvd"></param>
-        /// <returns></returns>
-        public bool SupprimerLivre(String jsonLivreDvd)
-        {
-            jsonLivreDvd = jsonLivreDvd.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(DELETE, "livre/" + jsonLivreDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Créer un DVD dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonDvd"></param>
-        /// <returns></returns>
-        public bool CreerDvd(String jsonDvd)
-        {
-            jsonDvd = jsonDvd.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(POST, "dvd/" + jsonDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Modifie un DVD dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="jsonDvd"></param>
-        /// <returns></returns>
-        public bool UpdateDvd(string id, String jsonDvd)
-        {
-            jsonDvd = jsonDvd.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(PUT, "dvd/" + id + "/" + jsonDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Supprime un DVD dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonDvd"></param>
-        /// <returns></returns>
-        public bool SupprimerDvd(String jsonDvd)
-        {
-            jsonDvd = jsonDvd.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(DELETE, "dvd/" + jsonDvd);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Créer une revue dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonRevue"></param>
-        /// <returns></returns>
-        public bool CreerRevue(String jsonRevue)
-        {
-            jsonRevue = jsonRevue.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(POST, "revue/" + jsonRevue);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Modifie une revue dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="jsonRevue"></param>
-        /// <returns></returns>
-        public bool UpdateRevue(string id, String jsonRevue)
-        {
-            jsonRevue = jsonRevue.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(PUT, "revue/" + id + "/" + jsonRevue);
-                return (liste != null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Supprime une revue dans la BDD, return true si l'opération, c'est correctement déroulé
-        /// </summary>
-        /// <param name="jsonRevue"></param>
-        /// <returns></returns>
-        public bool SupprimerRevue(String jsonRevue)
-        {
-            jsonRevue = jsonRevue.Replace(' ', '-');
-            try
-            {
-                // récupération soit d'une liste vide (requête ok) soit de null (erreur)
-                List<Object> liste = TraitementRecup<Object>(DELETE, "revue/" + jsonRevue);
+                List<Object> liste = TraitementRecup<Object>(DELETE, type + "/" + jsonEntite);
                 return (liste != null);
             }
             catch (Exception ex)
@@ -448,6 +219,42 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
+        /// Retourne les commandes d'un livre
+        /// </summary>
+        /// <param name="idLivre"></param>
+        /// <returns></returns>
+        public List<CommandeDocument> GetCommandesLivres(string idLivre)
+        {
+            String jsonIdDocument = convertToJson("idLivreDvd", idLivre);
+            List<CommandeDocument> lesCommandesLivres = TraitementRecup<CommandeDocument>(GET, "commandedocument/" + jsonIdDocument);
+            return lesCommandesLivres;
+        }
+
+        /// <summary>
+        /// Retourne les abonnements d'une revue
+        /// </summary>
+        /// <param name="idRevue"></param>
+        /// <returns></returns>
+        public List<Abonnement> GetAbonnements(string idRevue)
+        {
+            String jsonAbonnementIdRevue = convertToJson("idRevue", idRevue);
+            List<Abonnement> abonnements =  TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
+            return abonnements;
+        }
+
+        /// <summary>
+        /// Retourne l'index max en string
+        /// de certaines tables
+        /// </summary>
+        /// <param name="maxIndex"></param>
+        /// <returns></returns>
+        public string getMaxIndex(string maxIndex)
+        {
+            List<Categorie> maxindex = TraitementRecup<Categorie>(GET, maxIndex);
+            return maxindex[0].Id;
+        }
+
+        /// <summary>
         /// ecriture d'un exemplaire en base de données
         /// </summary>
         /// <param name="exemplaire">exemplaire à insérer</param>
@@ -455,8 +262,7 @@ namespace MediaTekDocuments.dal
         public bool CreerExemplaire(Exemplaire exemplaire)
         {
             String jsonExemplaire = JsonConvert.SerializeObject(exemplaire, new CustomDateTimeConverter());
-            try
-            {
+            try {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
                 List<Exemplaire> liste = TraitementRecup<Exemplaire>(POST, "exemplaire/" + jsonExemplaire);
                 return (liste != null);
@@ -465,7 +271,7 @@ namespace MediaTekDocuments.dal
             {
                 Console.WriteLine(ex.Message);
             }
-            return false;
+            return false; 
         }
 
         /// <summary>
@@ -475,12 +281,12 @@ namespace MediaTekDocuments.dal
         /// <param name="methode">verbe HTTP (GET, POST, PUT, DELETE)</param>
         /// <param name="message">information envoyée</param>
         /// <returns>liste d'objets récupérés (ou liste vide)</returns>
-        private List<T> TraitementRecup<T>(String methode, String message)
+        private List<T> TraitementRecup<T> (String methode, String message)
         {
             List<T> liste = new List<T>();
             try
             {
-                Console.WriteLine("TraitementRecup string = " + message);
+                Console.WriteLine("TraitementRecup " + methode + " et " + message);
                 JObject retour = api.RecupDistant(methode, message);
                 // extraction du code retourné
                 String code = (String)retour["code"];
@@ -498,10 +304,9 @@ namespace MediaTekDocuments.dal
                 {
                     Console.WriteLine("code erreur = " + code + " message = " + (String)retour["message"]);
                 }
-            }
-            catch (Exception e)
+            }catch(Exception e)
             {
-                Console.WriteLine("Erreur lors de l'accès à l'API : " + e.Message);
+                Console.WriteLine("Erreur lors de l'accès à l'API : "+e.Message);
                 Environment.Exit(0);
             }
             return liste;
