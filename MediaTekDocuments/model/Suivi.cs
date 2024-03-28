@@ -1,18 +1,15 @@
 ﻿
 namespace MediaTekDocuments.model
 {
-    /// <summary>
-    /// Classe métier Etat (état d'usure d'un document)
-    /// </summary>
-    public class Etat
+    public class Suivi
     {
-        public string Id { get; }
-        public string Libelle { get; }
+        public int Id { get; }
+        public string Etat { get; }
 
-        public Etat(string id, string libelle)
+        public Suivi(int id, string etat)
         {
             this.Id = id;
-            this.Libelle = libelle;
+            this.Etat = etat;
         }
 
         /// <summary>
@@ -21,7 +18,7 @@ namespace MediaTekDocuments.model
         /// <returns>Libelle</returns>
         public override string ToString()
         {
-            return this.Libelle;
+            return this.Etat;
         }
     }
 }
