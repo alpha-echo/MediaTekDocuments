@@ -23,20 +23,23 @@ namespace MediaTekDocuments.view
         private readonly BindingSource bdgRayons = new BindingSource();
         private readonly BindingSource bdgEtats = new BindingSource();
         private List<Etat> lesEtatsEx = new List<Etat>();
+        private Utilisateur utilisateur;
         private bool ajouterBool = false;
         private bool modifEtat = false;
+        private bool firstLoad = true;
 
 
         /// <summary>
         /// Constructeur : création du contrôleur lié à ce formulaire
         /// </summary>
-        internal FrmMediatek()
+        internal FrmMediatek(Utilisateur lutilisateur)
         {
             InitializeComponent();
             this.controller = new FrmMediatekController();
-            afficherAlerteAbo();
+            this.utilisateur = lutilisateur;
+            verifDroitAccueil(lutilisateur);
         }
-            
+
         /// <summary>
         /// Rempli un des 3 combo (genre, public, rayon)
         /// </summary>
@@ -110,23 +113,44 @@ namespace MediaTekDocuments.view
         /// </summary>
         private void afficherAlerteAbo()
         {
-            bool interupteur = false;
-            List<Revue> revues = controller.GetAllRevues();
-            string alerteRevues = "Revues dont l'abonnement se termine dans moins de 30 jours : \n";
-            foreach (Revue revue in revues)
+            if (controller.verifCommande(utilisateur))
             {
-                List<Abonnement> abonnements = controller.GetAbonnements(revue.Id);
-                if (abonnements.FindAll(o => (o.DateFinAbonnement <= DateTime.Now.AddMonths(1))
-                            && (o.DateFinAbonnement >= DateTime.Now)).Count > 0)
+                bool interupteur = false;
+                List<Revue> revues = controller.GetAllRevues();
+                string alerteRevues = "Revues dont l'abonnement se termine dans moins de 30 jours : \n";
+                foreach (Revue revue in revues)
                 {
-                    alerteRevues += "  -" + revue.Titre + "\n";
-                    interupteur = true;
+                    List<Abonnement> abonnements = controller.GetAbonnements(revue.Id);
+                    if (abonnements.FindAll(o => (o.DateFinAbonnement <= DateTime.Now.AddMonths(1))
+                                && (o.DateFinAbonnement >= DateTime.Now)).Count > 0)
+                    {
+                        alerteRevues += "  -" + revue.Titre + "\n";
+                        interupteur = true;
+                    }
                 }
-
+                if (interupteur)
+                    MessageBox.Show(alerteRevues);
             }
+        }
 
-            if(interupteur)
-                MessageBox.Show(alerteRevues);
+        private void verifDroitAccueil(Utilisateur lutilisateur)
+        {
+            if(!controller.verifDroitAccueil(lutilisateur))
+            {
+                MessageBox.Show("Droits insuffisant");
+                Application.Exit();
+            }
+        }
+
+        /// <summary>
+        /// Arrête le programme
+        /// quand on ferme la fenêtre 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit();
         }
         #endregion
 
@@ -158,8 +182,22 @@ namespace MediaTekDocuments.view
             RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cbxLivresExEtat);
             lesEtatsEx = controller.GetAllEtats();
             modifEtat = false;
-            enCoursModifLivres(false);
             RemplirLivresListeComplete();
+            if (controller.verifDroitModif(utilisateur))
+            {
+                enCoursModifLivres(false);
+                if (firstLoad)
+                {
+                    Thread.Sleep(150);
+                    afficherAlerteAbo();
+                    firstLoad = false;
+                }
+            }
+            else
+            {
+                ConsultationLivres();
+            }
+            
         }
 
         /// <summary>
@@ -542,6 +580,32 @@ namespace MediaTekDocuments.view
         }
 
         /// <summary>
+        /// Desactive les interfaces
+        /// </summary>
+        private void ConsultationLivres()
+        {
+            btnSupprimerLivresEx.Enabled = false;
+            btnModifierLivresEx.Enabled = false;
+            btnAjouterLivres.Enabled = false;
+            btnSupprimerLivres.Enabled = false;
+            btnModifierLivres.Enabled = false;
+            btnAnnulerLivres.Enabled = false;
+            btnValiderLivres.Enabled = false;
+            btnSupprimerLivresEx.Visible = false;
+            btnModifierLivresEx.Visible = false;
+            btnAjouterLivres.Visible = false;
+            btnSupprimerLivres.Visible = false;
+            btnModifierLivres.Visible = false;
+            btnAnnulerLivres.Visible = false;
+            btnValiderLivres.Visible = false;
+            cbxLivresExEtat.Enabled = false;
+            cbxLivresGenresInfo.Enabled = false;
+            cbxLivresPublicInfo.Enabled = false;
+            cbxLivresRayonInfo.Enabled = false;
+            dtpLivresDateAchatEx.Enabled = false;
+        }
+
+        /// <summary>
         /// démarre la procédure d'ajout de livre
         /// </summary>
         /// <param name="sender"></param>
@@ -903,8 +967,17 @@ namespace MediaTekDocuments.view
             RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cbxDvdExEtat);
             lesEtatsEx = controller.GetAllEtats();
             modifEtat = false;
-            enCoursModifDvd(false);
             RemplirDvdListeComplete();
+            if (controller.verifDroitModif(utilisateur))
+            {
+                enCoursModifDvd(false);
+            }
+            else
+            {
+                ConsultationDvd();
+            }
+              
+            
         }
 
         /// <summary>
@@ -1285,6 +1358,32 @@ namespace MediaTekDocuments.view
         }
 
         /// <summary>
+        /// Desactive les interfaces
+        /// </summary>
+        private void ConsultationDvd()
+        {
+            btnSupprimerDvdEx.Enabled = false;
+            btnModifierDvdEx.Enabled = false;
+            btnAjouterDvd.Enabled = false;
+            btnSupprimerDvd.Enabled = false;
+            btnModifierDvd.Enabled = false;
+            btnAnnulerDvd.Enabled = false;
+            btnValiderDvd.Enabled = false;
+            btnSupprimerDvdEx.Visible = false;
+            btnModifierDvdEx.Visible = false;
+            btnAjouterDvd.Visible = false;
+            btnSupprimerDvd.Visible = false;
+            btnModifierDvd.Visible = false;
+            btnAnnulerDvd.Visible = false;
+            btnValiderDvd.Visible = false;
+            cbxDvdGenresInfo.Enabled = false;
+            cbxDvdPublicInfo.Enabled = false;
+            cbxDvdRayonInfo.Enabled = false;
+            dtpDvdDateAchatEx.Enabled = false;
+            cbxDvdExEtat.Enabled = false;
+        }
+
+        /// <summary>
         /// lance la procédure d'ajout d'un nouveau dvd
         /// </summary>
         /// <param name="sender"></param>
@@ -1363,7 +1462,7 @@ namespace MediaTekDocuments.view
             bool checkValid = true;
             if (MessageBox.Show("Etes vous sur ?", "oui ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                string id = txbDvdNumero.Text; ;
+                string id = txbDvdNumero.Text;
                 Genre unGenre = (Genre)cbxDvdGenresInfo.SelectedItem;
                 Public unPublic = (Public)cbxDvdPublicInfo.SelectedItem;
                 Rayon unRayon = (Rayon)cbxDvdRayonInfo.SelectedItem;
@@ -1641,8 +1740,15 @@ namespace MediaTekDocuments.view
             RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cbxRevuesExEtat);
             lesEtatsEx = controller.GetAllEtats();
             modifEtat = false;
-            enCoursModifRevues(false);
             RemplirRevuesListeComplete();
+            if (controller.verifDroitModif(utilisateur))
+            {
+                enCoursModifRevues(false);
+            }
+            else
+            {
+                ConsultationRevue();
+            }  
         }
 
         /// <summary>
@@ -2020,6 +2126,32 @@ namespace MediaTekDocuments.view
         }
 
         /// <summary>
+        /// Desactive les interfaces
+        /// </summary>
+        private void ConsultationRevue()
+        {
+            btnSupprimerRevuesEx.Enabled = false;
+            btnModifierRevuesEx.Enabled = false;
+            btnAjouterRevues.Enabled = false;
+            btnSupprimerRevues.Enabled = false;
+            btnModifierRevues.Enabled = false;
+            btnAnnulerRevues.Enabled = false;
+            btnValiderRevues.Enabled = false;
+            btnSupprimerRevuesEx.Visible = false;
+            btnModifierRevuesEx.Visible = false;
+            btnAjouterRevues.Visible = false;
+            btnSupprimerRevues.Visible = false;
+            btnModifierRevues.Visible = false;
+            btnAnnulerRevues.Visible = false;
+            btnValiderRevues.Visible = false;
+            cbxRevuesGenresInfo.Enabled = false;
+            cbxRevuesPublicInfo.Enabled = false;
+            cbxRevuesRayonInfo.Enabled = false;
+            dtpRevuesDateAchatEx.Enabled = false;
+            cbxRevuesExEtat.Enabled = false;
+        }
+
+        /// <summary>
         /// lance la procédure d'ajout d'une revue dans la bdd
         /// </summary>
         /// <param name="sender"></param>
@@ -2106,7 +2238,7 @@ namespace MediaTekDocuments.view
             bool checkValid;
             if (MessageBox.Show("Etes vous sur ?", "oui ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                string id = txbRevuesNumero.Text; ;
+                string id = txbRevuesNumero.Text;
                 int delaiMiseADispo = 0;
                 int? b = null;
                 try
@@ -2383,6 +2515,11 @@ namespace MediaTekDocuments.view
             txbReceptionRevueNumero.Text = "";
             RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cxbReceptionRevueEtatEx);
             lesEtatsEx = controller.GetAllEtats();
+            if (!controller.verifDroitModif(utilisateur))
+            {
+                grpReceptionExemplaire.Enabled = false;
+                grpReceptionExemplaire.Visible = false;
+            }
         }
 
         /// <summary>
@@ -2636,14 +2773,22 @@ namespace MediaTekDocuments.view
         /// <param name="e"></param>
         private void TabLivresCom_Enter(object sender, EventArgs e)
         {
-            lesLivresCom = controller.GetAllLivres();
-            RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxLivresComGenres);
-            RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxLivresComPublics);
-            RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxLivresComRayons);
-            RemplirComboSuivi(controller.GetAllSuivis(), bdgLivresComEtat, cbxLivresComEtat);
-            RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cbxLivresExEtat);
-            enCoursModifLivresCom(false);
-            RemplirLivresComListeComplete();
+            if(!controller.verifCommande(utilisateur))
+            {
+                MessageBox.Show("Droits insuffisant");
+                tabControl.SelectedIndex = 0;
+            }
+            else
+            {
+                lesLivresCom = controller.GetAllLivres();
+                RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxLivresComGenres);
+                RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxLivresComPublics);
+                RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxLivresComRayons);
+                RemplirComboSuivi(controller.GetAllSuivis(), bdgLivresComEtat, cbxLivresComEtat);
+                RemplirComboEtat(controller.GetAllEtats(), bdgEtats, cbxLivresExEtat);
+                enCoursModifLivresCom(false);
+                RemplirLivresComListeComplete();
+            }
         }
 
         /// <summary>
@@ -3263,13 +3408,21 @@ namespace MediaTekDocuments.view
         /// <param name="e"></param>
         private void TabDvdCom_Enter(object sender, EventArgs e)
         {
-            lesDvdCom = controller.GetAllDvd();
-            RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxDvdComGenres);
-            RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxDvdComPublics);
-            RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxDvdComRayons);
-            RemplirComboSuivi(controller.GetAllSuivis(), bdgDvdComEtat, cbxDvdComEtat);
-            enCoursModifDvdCom(false);
-            RemplirDvdComListeComplete();
+            if (!controller.verifCommande(utilisateur))
+            {
+                MessageBox.Show("Droits insuffisant");
+                tabControl.SelectedIndex = 0;
+            }
+            else
+            {
+                lesDvdCom = controller.GetAllDvd();
+                RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxDvdComGenres);
+                RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxDvdComPublics);
+                RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxDvdComRayons);
+                RemplirComboSuivi(controller.GetAllSuivis(), bdgDvdComEtat, cbxDvdComEtat);
+                enCoursModifDvdCom(false);
+                RemplirDvdComListeComplete();
+            }
         }
 
         /// <summary>
@@ -3789,6 +3942,9 @@ namespace MediaTekDocuments.view
                 case "Duree":
                     sortedList = lesDvdCom.OrderBy(o => o.Duree).ToList();
                     break;
+                case "Realisateur":
+                    sortedList = lesDvdCom.OrderBy(o => o.Duree).ToList();
+                    break;
                 case "Genre":
                     sortedList = lesDvdCom.OrderBy(o => o.Genre).ToList();
                     break;
@@ -3880,13 +4036,21 @@ namespace MediaTekDocuments.view
         /// <param name="e"></param>
         private void TabAbo_Enter(object sender, EventArgs e)
         {
-            lesRevuesAbo = controller.GetAllRevues();
-            RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxAboGenres);
-            RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxAboPublics);
-            RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxAboRayons);
-            enCoursModifAbo(false);
-            RemplirAboListeComplete();
-            filtre = false;
+            if (!controller.verifCommande(utilisateur))
+            {
+                MessageBox.Show("Droits insuffisant");
+                tabControl.SelectedIndex = 0;  // <- si pas de droit on est redirigé apres message sur le premiere onglet
+            }
+            else
+            {
+                lesRevuesAbo = controller.GetAllRevues();
+                RemplirComboCategorie(controller.GetAllGenres(), bdgGenres, cbxAboGenres);
+                RemplirComboCategorie(controller.GetAllPublics(), bdgPublics, cbxAboPublics);
+                RemplirComboCategorie(controller.GetAllRayons(), bdgRayons, cbxAboRayons);
+                enCoursModifAbo(false);
+                RemplirAboListeComplete();
+                filtre = false;
+            }
         }
 
         /// <summary>

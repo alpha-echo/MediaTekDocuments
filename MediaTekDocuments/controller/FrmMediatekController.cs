@@ -72,6 +72,50 @@ namespace MediaTekDocuments.controller
         }
 
         /// <summary>
+        /// Retourne vrai ou faux si le service de l'utilisateur
+        /// est autorisé
+        /// </summary>
+        /// <param name="utilisateur"></param>
+        /// <returns></returns>
+        public bool verifDroitAccueil(Utilisateur utilisateur)
+        {
+            Console.WriteLine(utilisateur.Nom);
+            List<string> services = new List<string> {"compta", "biblio", "accueil" };
+            if (services.Contains(utilisateur.Service))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Retourne vrai ou faux si le service de l'utilisateur
+        /// est autorisé
+        /// </summary>
+        /// <param name="utilisateur"></param>
+        /// <returns></returns>
+        public bool verifDroitModif(Utilisateur utilisateur)
+        {
+            Console.WriteLine(utilisateur.Nom);
+            List<string> services = new List<string> {"biblio", "accueil" };
+            if (services.Contains(utilisateur.Service))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Retourne vrai ou faux si le service de l'utilisateur
+        /// est autorisé
+        /// </summary>
+        /// <param name="utilisateur"></param>
+        /// <returns></returns>
+        public bool verifCommande(Utilisateur utilisateur)
+        {
+            List<string> services = new List<string> {"biblio" };
+            if (services.Contains(utilisateur.Service))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// Modification du convertisseur Json pour gérer le format de date
         /// </summary>
         private sealed class CustomDateTimeConverter : IsoDateTimeConverter
@@ -182,7 +226,7 @@ namespace MediaTekDocuments.controller
         /// <returns>true si oppration valide</returns>
         public bool SupprimerDvd(Dvd dvd)
         {
-            return access.SupprimerEntite("dvd", JsonConvert.SerializeObject(dvd)); ;
+            return access.SupprimerEntite("dvd", JsonConvert.SerializeObject(dvd));
         }
         #endregion
 
