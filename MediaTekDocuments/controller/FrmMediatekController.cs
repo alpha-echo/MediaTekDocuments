@@ -77,7 +77,7 @@ namespace MediaTekDocuments.controller
         /// </summary>
         /// <param name="utilisateur"></param>
         /// <returns></returns>
-        public bool VerifDroitAccueil(Utilisateur utilisateur)
+        public bool verifDroitAccueil(Utilisateur utilisateur)
         {
             Console.WriteLine(utilisateur.Nom);
             List<string> services = new List<string> {"compta", "biblio", "accueil" };
@@ -92,7 +92,7 @@ namespace MediaTekDocuments.controller
         /// </summary>
         /// <param name="utilisateur"></param>
         /// <returns></returns>
-        public bool VerifDroitModif(Utilisateur utilisateur)
+        public bool verifDroitModif(Utilisateur utilisateur)
         {
             Console.WriteLine(utilisateur.Nom);
             List<string> services = new List<string> {"biblio", "accueil" };
@@ -107,7 +107,7 @@ namespace MediaTekDocuments.controller
         /// </summary>
         /// <param name="utilisateur"></param>
         /// <returns></returns>
-        public bool VerifCommande(Utilisateur utilisateur)
+        public bool verifCommande(Utilisateur utilisateur)
         {
             List<string> services = new List<string> {"biblio" };
             if (services.Contains(utilisateur.Service))
@@ -308,36 +308,36 @@ namespace MediaTekDocuments.controller
         /// Retourne l'id max des commandes
         /// </summary>
         /// <returns></returns>
-        public string GetNbCommandeMax()
+        public string getNbCommandeMax()
         {
-            return access.GetMaxIndex("maxcommande");
+            return access.getMaxIndex("maxcommande");
         }
 
         /// <summary>
         /// Retourne l'id max des livres
         /// </summary>
         /// <returns></returns>
-        public string GetNbLivreMax()
+        public string getNbLivreMax()
         {
-            return access.GetMaxIndex("maxlivre");
+            return access.getMaxIndex("maxlivre");
         }
 
         /// <summary>
         /// Retourne l'id max des Dvd
         /// </summary>
         /// <returns></returns>
-        public string GetNbDvdMax()
+        public string getNbDvdMax()
         {
-            return access.GetMaxIndex("maxdvd");
+            return access.getMaxIndex("maxdvd");
         }
 
         /// <summary>
         /// Retourne l'id max des revues
         /// </summary>
         /// <returns></returns>
-        public string GetNbRevueMax()
+        public string getNbRevueMax()
         {
-            return access.GetMaxIndex("maxrevue");
+            return access.getMaxIndex("maxrevue");
         }
 
         /// <summary>

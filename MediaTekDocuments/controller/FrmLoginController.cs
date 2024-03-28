@@ -18,6 +18,7 @@ namespace MediaTekDocuments.controller
 
         private Utilisateur utilisateur = null;
 
+        private FrmMediatek mediatek;
 
         /// <summary>
         /// Récupération de l'instance unique d'accès aux données
@@ -27,21 +28,13 @@ namespace MediaTekDocuments.controller
             access = Access.GetInstance();
         }
 
-        /// <summary>
-        /// Lance la vue principale
-        /// </summary>
-        private void Init()
+
+        private void init()
         {
-            FrmMediatek mediatek = new FrmMediatek(utilisateur);
+            mediatek = new FrmMediatek(utilisateur);
             mediatek.Show();
         }
 
-        /// <summary>
-        /// Retourne vrai si l'utilisateur existe dans la BDD
-        /// </summary>
-        /// <param name="mail"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
         public bool GetLogin(string mail, string password)
         {
             password = "Mediatek" + password;
@@ -53,19 +46,13 @@ namespace MediaTekDocuments.controller
             utilisateur = access.GetLogin(mail, hash);
             if (utilisateur != null)
             {
-                Init();
+                init();
                 return true;
             }
 
             return false;
         }
 
-        /// <summary>
-        /// Retourne le hash au format string
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
         private static string GetHash(HashAlgorithm hashAlgorithm, string input)
         {
 
