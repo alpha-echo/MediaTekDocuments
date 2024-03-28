@@ -133,13 +133,27 @@ namespace MediaTekDocuments.view
             }
         }
 
+        /// <summary>
+        /// Vérifie si les droits utilisateur
+        /// </summary>
+        /// <param name="lutilisateur"></param>
         private void VerifDroitAccueil(Utilisateur lutilisateur)
         {
-            if(!controller.VerifDroitAccueil(lutilisateur))
+            if (!controller.VerifDroitAccueil(lutilisateur))
             {
                 MessageBox.Show("Droits insuffisant");
                 Application.Exit();
             }
+        }
+
+        /// <summary>
+        /// Retourne la quantité d'exemplaire
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int VerifExemplaire(string id)
+        {
+            return controller.GetExemplairesRevue(id).Count();
         }
 
         /// <summary>
@@ -156,13 +170,13 @@ namespace MediaTekDocuments.view
 
         #region Onglet Livres
         private readonly BindingSource bdgLivresListe = new BindingSource();
-        private List<Livre> lesLivres = new List<Livre>();  
+        private List<Livre> lesLivres = new List<Livre>();
         private readonly BindingSource bdgGenresInfo = new BindingSource();
         private readonly BindingSource bdgPublicsInfo = new BindingSource();
         private readonly BindingSource bdgRayonsInfo = new BindingSource();
         private readonly BindingSource bdgLivresListeEx = new BindingSource();
         private List<Exemplaire> lesExemplairesLivres = new List<Exemplaire>();
-        
+
 
         /// <summary>
         /// Ouverture de l'onglet Livres : 
@@ -202,7 +216,7 @@ namespace MediaTekDocuments.view
             {
                 ConsultationLivres();
             }
-            
+
         }
 
         /// <summary>
@@ -230,7 +244,7 @@ namespace MediaTekDocuments.view
         /// <param name="exemplaires"></param>
         private void RemplirLivresListeExemplaire(List<Exemplaire> exemplaires)
         {
-            if( exemplaires.Count > 0)
+            if (exemplaires.Count > 0)
             {
                 bdgLivresListeEx.DataSource = exemplaires;
                 dgvLivresListeEx.DataSource = bdgLivresListeEx;
@@ -242,7 +256,7 @@ namespace MediaTekDocuments.view
                 dgvLivresListeEx.Columns["dateAchat"].DefaultCellStyle.Format = "d/M/yyyy";
                 dgvLivresListeEx.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 //change les idEtats en la valeur de leur libelle 
-                for (int i = 0 ; i < dgvLivresListeEx.RowCount; i++)
+                for (int i = 0; i < dgvLivresListeEx.RowCount; i++)
                 {
                     if (int.TryParse(dgvLivresListeEx.Rows[i].Cells["idEtat"].Value.ToString(), out _))
                         dgvLivresListeEx.Rows[i].Cells["idEtat"].Value = lesEtatsEx.First(o => o.Id == dgvLivresListeEx.Rows[i].Cells["idEtat"].Value.ToString());
@@ -654,16 +668,23 @@ namespace MediaTekDocuments.view
             if (MessageBox.Show("Etes vous sur de vouloir supprimer" + leLivre.Titre + " de " + leLivre.Auteur + " ?",
                 "Validation suppresion", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                // fonction a modifier pour prendre en charge le faite que l'on ne pourra pas supprimer un livre tant que des examplaire de se livre existe
-                if (controller.SupprimerLivre(leLivre))
+                if (VerifExemplaire(leLivre.Id) == 0)
                 {
-                    Thread.Sleep(100);
-                    lesLivres = controller.GetAllLivres();
-                    RemplirLivresListeComplete();
+                    // fonction a modifier pour prendre en charge le faite que l'on ne pourra pas supprimer un livre tant que des examplaire de se livre existe
+                    if (controller.SupprimerLivre(leLivre))
+                    {
+                        Thread.Sleep(100);
+                        lesLivres = controller.GetAllLivres();
+                        RemplirLivresListeComplete();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erreur");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Erreur");
+                    MessageBox.Show("Vous ne pouvez pas supprimer une revue dont des exemplaire existe ");
                 }
             }
         }
@@ -726,7 +747,9 @@ namespace MediaTekDocuments.view
         {
             bool checkValid;
             if (!ajouterBool)  // si on est en  modification
+            {
                 checkValid = controller.UpdateLivre(livre);
+            }
             else      // si on est en creation
                 checkValid = controller.CreerLivre(livre);
             if (checkValid)
@@ -750,7 +773,7 @@ namespace MediaTekDocuments.view
         /// <param name="e"></param>
         private void BtnSupprimerLivresEx_Click(object sender, EventArgs e)
         {
-            if(modifEtat)
+            if (modifEtat)
             {
                 modifEtat = false;
                 btnSupprimerLivresEx.Text = "Supprimer";
@@ -762,7 +785,7 @@ namespace MediaTekDocuments.view
             }
             else
             {
-                if(dgvLivresListeEx.CurrentCell != null)
+                if (dgvLivresListeEx.CurrentCell != null)
                 {
                     if (MessageBox.Show("Etes vous de supprimer l'exemplaire " + txbLivresNbEx.Text + " ? ", "oui ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
@@ -804,7 +827,7 @@ namespace MediaTekDocuments.view
                     DateTime dateAchat = dtpLivresDateAchatEx.Value;
                     string photo = txbLivresPhotoEx.Text;
                     VerifValueLivreComLivresEx();
-                    string idEtat = ( cbxLivresExEtat.SelectedIndex > - 1 ) ? ((Etat)cbxLivresExEtat.SelectedItem).Id : "";
+                    string idEtat = (cbxLivresExEtat.SelectedIndex > -1) ? ((Etat)cbxLivresExEtat.SelectedItem).Id : "";
                     string iDocument = txbLivresExId.Text;
                     if (numero != -1 && idEtat != "" && iDocument != "")
                     {
@@ -818,7 +841,7 @@ namespace MediaTekDocuments.view
                     }
                 }
             }
-            else 
+            else
             {
                 LancementModifLivresEx();
             }
@@ -868,7 +891,7 @@ namespace MediaTekDocuments.view
                     MessageBox.Show("Aucun etat selectionné");
             }
         }
-        
+
         /// <summary>
         /// Tri sur les colonnes
         /// </summary>
@@ -1001,8 +1024,8 @@ namespace MediaTekDocuments.view
             {
                 ConsultationDvd();
             }
-              
-            
+
+
         }
 
         /// <summary>
@@ -1451,16 +1474,23 @@ namespace MediaTekDocuments.view
             if (MessageBox.Show("Etes vous sur de vouloir supprimer" + leDvd.Titre + " de " + leDvd.Realisateur + " ?",
                 "Validation suppresion", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                // fonction a modifier pour prendre en charge le faite que l'on ne pourra pas supprimer un livre tant que des examplaire de se livre existe
-                if (controller.SupprimerDvd(leDvd))
+                if (VerifExemplaire(leDvd.Id) == 0)
                 {
-                    Thread.Sleep(100);
-                    lesDvd = controller.GetAllDvd();
-                    RemplirDvdListeComplete();
+                    // fonction a modifier pour prendre en charge le faite que l'on ne pourra pas supprimer un livre tant que des examplaire de se livre existe
+                    if (controller.SupprimerDvd(leDvd))
+                    {
+                        Thread.Sleep(100);
+                        lesDvd = controller.GetAllDvd();
+                        RemplirDvdListeComplete();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erreur");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Erreur");
+                    MessageBox.Show("Vous ne pouvez pas supprimer un DVD dont des exemplaires existent");
                 }
             }
         }
@@ -1793,7 +1823,7 @@ namespace MediaTekDocuments.view
             else
             {
                 ConsultationRevue();
-            }  
+            }
         }
 
         /// <summary>
@@ -2241,7 +2271,6 @@ namespace MediaTekDocuments.view
             {
                 if (controller.GetExemplairesRevue(laRevue.Id).Count == 0)
                 {
-
                     if (controller.SupprimerRevue(laRevue))
                     {
                         Thread.Sleep(100);
@@ -2838,7 +2867,7 @@ namespace MediaTekDocuments.view
         /// <param name="e"></param>
         private void TabLivresCom_Enter(object sender, EventArgs e)
         {
-            if(!controller.VerifCommande(utilisateur))
+            if (!controller.VerifCommande(utilisateur))
             {
                 MessageBox.Show("Droits insuffisant");
                 tabControl.SelectedIndex = 0;
@@ -3270,8 +3299,8 @@ namespace MediaTekDocuments.view
             {
                 string id = txbLivresComNbCommande.Text;
                 DateTime dateCommande = dtpLivresComDateCommande.Value;
-                float montant = float.TryParse(txbLivresComMontant.Text, out _) ? float.Parse(txbLivresComMontant.Text) : - 1 ;
-                int nbExemplaire = int.TryParse(txbLivresComNbExemplaires.Text, out _) ? int.Parse(txbLivresComNbExemplaires.Text) : - 1;
+                float montant = float.TryParse(txbLivresComMontant.Text, out _) ? float.Parse(txbLivresComMontant.Text) : -1;
+                int nbExemplaire = int.TryParse(txbLivresComNbExemplaires.Text, out _) ? int.Parse(txbLivresComNbExemplaires.Text) : -1;
                 string idLivreDvd = txbLivresComNumLivre.Text;
                 int idSuivi = 0;
                 string etat = "";
@@ -3318,12 +3347,12 @@ namespace MediaTekDocuments.view
             int nbExemplaire = -1;
             try
             {
-                 montant = float.Parse(txbLivresComMontant.Text);
-                 nbExemplaire = int.Parse(txbLivresComNbExemplaires.Text);
+                montant = float.Parse(txbLivresComMontant.Text);
+                nbExemplaire = int.Parse(txbLivresComNbExemplaires.Text);
             }
             catch
-            {   
-                if (montant == - 1)
+            {
+                if (montant == -1)
                     MessageBox.Show("Le montant doit etre un nombre a virgule");
                 if (nbExemplaire == -1)
                     MessageBox.Show("Le nombre d'exemplaire doit etre un nombre a entier");
@@ -3481,7 +3510,7 @@ namespace MediaTekDocuments.view
 
 
         #endregion
- 
+
         #region Onglet Commandes de Dvd
 
         private readonly BindingSource bdgDvdComListe = new BindingSource();
@@ -3794,7 +3823,7 @@ namespace MediaTekDocuments.view
             btnDvdComAnnulGenres.Enabled = !modif;
             btnlivresComAnnulPublics.Enabled = !modif;
             ajouterBool = false;
-                
+
         }
 
         /// <summary>
@@ -3984,9 +4013,9 @@ namespace MediaTekDocuments.view
             }
             catch
             {
-                if (montant == - 1)
+                if (montant == -1)
                     MessageBox.Show("Le montant doit etre un nombre a virgule");
-                if (nbExemplaire == - 1)
+                if (nbExemplaire == -1)
                     MessageBox.Show("Le nombre d'exemplaire doit etre un nombre a entier");
             }
             Suivi suivi = (Suivi)cbxDvdComEtat.SelectedItem;
@@ -4349,7 +4378,7 @@ namespace MediaTekDocuments.view
             string idRevue = revue.Id;
             VideAboInfos();
             lesAbonnements = controller.GetAbonnements(idRevue);
-            grpAboCommandes.Text = revue.Titre ;
+            grpAboCommandes.Text = revue.Titre;
             if (lesAbonnements.Count == 0)
                 VideAboInfos();
             RemplirAboListeCommandes(lesAbonnements);
@@ -4581,7 +4610,7 @@ namespace MediaTekDocuments.view
                 filtre = true;
             }
             RemplirAboListeComplete();
-        }  
+        }
 
         /// <summary>
         /// Filtre les abonnement dont la fin est
@@ -4651,7 +4680,7 @@ namespace MediaTekDocuments.view
                         checkValid = controller.UpdateAbonnement(abonnement);
                     else
                         checkValid = controller.CreerAbonnement(abonnement);
-                    if( checkValid)
+                    if (checkValid)
                     {
                         EnCoursModifAbo(false);
                         Thread.Sleep(100);
@@ -4797,7 +4826,3 @@ namespace MediaTekDocuments.view
 
     }
 }
-
-
-
-

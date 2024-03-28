@@ -1,4 +1,4 @@
-ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MediaTekDocuments.model;
 using System;
 using System.Collections.Generic;
@@ -12,20 +12,20 @@ namespace MediaTekDocuments.model.Tests
     public class CategorieTests
     {
         private const string id = "002";
-        private const string libelle = "libelle";
-        private static readonly Categorie categorie = new Categorie(id, libelle);
+        private const string libelle = "Horreure";
+        private static readonly Categorie categorie = new Genre(id, libelle);
 
         [TestMethod()]
         public void CategorieTest()
         {
-            Assert.AreEqual(id, categorie.Id, "devrait rÃ©ussir : id valorisÃ©");
-            Assert.AreEqual(libelle, categorie.Libelle, "devrait rÃ©ussir : libellÃ© valorisÃ©");
+            Assert.AreEqual(id, categorie.Id, "devrait réussir : id valorisé");
+            Assert.AreEqual(libelle, categorie.Libelle, "devrait réussir : libellé valorisé");
         }
 
         [TestMethod()]
         public void ToStringTest()
         {
-            Assert.AreEqual(libelle, categorie.ToString(), "devrait rÃ©ussir ");
+            Assert.AreEqual(libelle, categorie.ToString(), "devrait réussir ");
         }
     }
 }
