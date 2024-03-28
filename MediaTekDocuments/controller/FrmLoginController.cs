@@ -48,7 +48,7 @@ namespace MediaTekDocuments.controller
             string hash = "";
             using (SHA256 sha256Hash = SHA256.Create())
             {
-                hash = GetHash(sha256Hash, password);
+                 hash = GetHash(sha256Hash, password);
             }
             utilisateur = access.GetLogin(mail, hash);
             if (utilisateur != null)

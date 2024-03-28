@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
+using Serilog;
 
 namespace MediaTekDocuments.dal
 {
@@ -55,12 +56,20 @@ namespace MediaTekDocuments.dal
         {
             try
             {
-                String authenticationString = GetAuthentificationString(authenticationName);
-                String uriApi = GetAuthentificationString(uriApiName);
+                Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    .WriteTo.Console()
+                    .WriteTo.File("logs/log.txt")
+                    .CreateLogger();
+                //String authenticationString = GetAuthentificationString(authenticationName);
+                //String uriApi = GetAuthentificationString(uriApiName);
+                String authenticationString = "admin:adminpwd";
+                String uriApi = "http://localhost/rest_mediatekdocuments/";
                 api = ApiRest.GetInstance(uriApi, authenticationString);
             }
             catch (Exception e)
             {
+                Log.Fatal("Access catch erreur={0}", e.Message);
                 Console.WriteLine(e.Message);
                 Environment.Exit(0);
             }
@@ -72,7 +81,7 @@ namespace MediaTekDocuments.dal
         /// <returns>instance unique de la classe</returns>
         public static Access GetInstance()
         {
-            if (instance == null)
+            if(instance == null)
             {
                 instance = new Access();
             }
@@ -94,13 +103,13 @@ namespace MediaTekDocuments.dal
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mail"></param>
-        /// <param name="hash"></param>
-        /// <returns></returns>
-        public Utilisateur GetLogin(string mail, string hash)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mail"></param>
+    /// <param name="hash"></param>
+    /// <returns></returns>
+    public Utilisateur GetLogin(string mail, string hash)
         {
             Dictionary<string, string> login = new Dictionary<string, string>
             {
@@ -111,6 +120,7 @@ namespace MediaTekDocuments.dal
             List<Utilisateur> utilisateurs = TraitementRecup<Utilisateur>(GET, "utilisateur/" + mailHash);
             if (utilisateurs.Count > 0)
                 return utilisateurs[0];
+            Log.Error("Access.GetLogin catch user fail connection :" + mail);
             return null;
         }
 
@@ -189,6 +199,7 @@ namespace MediaTekDocuments.dal
             }
             catch (Exception ex)
             {
+                Log.Error("Access.CreerEntite catch type erreur={0}, table={1}, champs={2}", ex, type, jsonEntite);
                 Console.WriteLine(ex.Message);
             }
             return false;
@@ -210,6 +221,7 @@ namespace MediaTekDocuments.dal
             }
             catch (Exception ex)
             {
+                Log.Error("Access.UpdateEntite catch type erreur={0}, table={1}, champs={2}", ex, type, jsonEntite);
                 Console.WriteLine(ex.Message);
             }
             return false;
@@ -230,6 +242,7 @@ namespace MediaTekDocuments.dal
             }
             catch (Exception ex)
             {
+                Log.Error("Access.SupprimerEntite catch type erreur={0}, table={1}, champs={2}", ex, type, jsonEntite);
                 Console.WriteLine(ex.Message);
             }
             return false;
@@ -289,7 +302,7 @@ namespace MediaTekDocuments.dal
         public List<Abonnement> GetAbonnements(string idRevue)
         {
             String jsonAbonnementIdRevue = ConvertToJson("idRevue", idRevue);
-            List<Abonnement> abonnements = TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
+            List<Abonnement> abonnements =  TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
             return abonnements;
         }
 
@@ -313,17 +326,17 @@ namespace MediaTekDocuments.dal
         public bool CreerExemplaire(Exemplaire exemplaire)
         {
             String jsonExemplaire = JsonConvert.SerializeObject(exemplaire, new CustomDateTimeConverter());
-            try
-            {
+            try {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
                 List<Exemplaire> liste = TraitementRecup<Exemplaire>(POST, "exemplaire/" + jsonExemplaire);
                 return (liste != null);
             }
             catch (Exception ex)
             {
+                Log.Error("Access.CreerExemplaire catch type erreur={0} champs={1}", ex, jsonExemplaire);
                 Console.WriteLine(ex.Message);
             }
-            return false;
+            return false; 
         }
 
         /// <summary>
@@ -333,7 +346,7 @@ namespace MediaTekDocuments.dal
         /// <param name="methode">verbe HTTP (GET, POST, PUT, DELETE)</param>
         /// <param name="message">information envoyée</param>
         /// <returns>liste d'objets récupérés (ou liste vide)</returns>
-        private List<T> TraitementRecup<T>(String methode, String message)
+        private List<T> TraitementRecup<T> (String methode, String message)
         {
             List<T> liste = new List<T>();
             try
@@ -355,11 +368,12 @@ namespace MediaTekDocuments.dal
                 else
                 {
                     Console.WriteLine("code erreur = " + code + " message = " + (String)retour["message"]);
+                    Log.Error("Access.TraitementRecup code erreur = " + code + " message = " + (String)retour["message"]);
                 }
-            }
-            catch (Exception e)
+            }catch(Exception e)
             {
-                Console.WriteLine("Erreur lors de l'accès à l'API : " + e.Message);
+                Console.WriteLine("Erreur lors de l'accès à l'API : "+e.Message);
+                Log.Fatal("Erreur lors de l'accès à l'API : " + e.Message);
                 Environment.Exit(0);
             }
             return liste;

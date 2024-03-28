@@ -79,9 +79,11 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool VerifDroitAccueil(Utilisateur utilisateur)
         {
-            Console.WriteLine(utilisateur.Nom);
             List<string> services = new List<string> { "compta", "biblio", "accueil" };
-            if (services.Contains(utilisateur.Service))
+            //Console.WriteLine(utilisateur.Nom);
+            //Console.WriteLine(utilisateur.Service);
+            //Console.WriteLine(services.Contains(utilisateur.Service.Libelle));
+            if (services.Contains(utilisateur.Service.Libelle))
                 return true;
             return false;
         }
@@ -94,9 +96,9 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool VerifDroitModif(Utilisateur utilisateur)
         {
-            Console.WriteLine(utilisateur.Nom);
-            List<string> services = new List<string> { "biblio", "accueil" };
-            if (services.Contains(utilisateur.Service))
+            //Console.WriteLine(utilisateur.Nom);
+            List<string> services = new List<string> {"biblio", "accueil" };
+            if (services.Contains(utilisateur.Service.Libelle))
                 return true;
             return false;
         }
@@ -109,8 +111,8 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool VerifCommande(Utilisateur utilisateur)
         {
-            List<string> services = new List<string> { "biblio" };
-            if (services.Contains(utilisateur.Service))
+            List<string> services = new List<string> {"biblio" };
+            if (services.Contains(utilisateur.Service.Libelle))
                 return true;
             return false;
         }
@@ -349,7 +351,7 @@ namespace MediaTekDocuments.controller
         {
             return access.CreerEntite("commandedocument", JsonConvert.SerializeObject(commandeLivreDvd, new CustomDateTimeConverter()));
         }
-
+        
         /// <summary>
         /// Modifie une commande livre/Dvd dans la bdd
         /// </summary>
@@ -390,7 +392,7 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool CreerAbonnement(Abonnement abonnement)
         {
-            return access.CreerEntite("abonnement", JsonConvert.SerializeObject(abonnement, new CustomDateTimeConverter()));
+            return access.CreerEntite("abonnement", JsonConvert.SerializeObject(abonnement,  new CustomDateTimeConverter()));
         }
 
         /// <summary>
