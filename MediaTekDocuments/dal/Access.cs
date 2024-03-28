@@ -17,7 +17,11 @@ namespace MediaTekDocuments.dal
         /// <summary>
         /// adresse de l'API
         /// </summary>
-        private static readonly string uriApi = "http://localhost/rest_mediatekdocuments/";
+        private static readonly string uriApiName = "MediaTekDocuments.Properties.Settings.mediatekConnectionString";
+        /// <summary>
+        /// pwd et login de l'API
+        /// </summary>
+        private static readonly string authenticationName = "MediaTekDocuments.Properties.Settings.mediatekAuthenticationString";
         /// <summary>
         /// instance unique de la classe
         /// </summary>
@@ -49,10 +53,10 @@ namespace MediaTekDocuments.dal
         /// </summary>
         private Access()
         {
-            String authenticationString;
             try
             {
-                authenticationString = "admin:adminpwd";
+                String authenticationString = GetAuthentificationString(authenticationName);
+                String uriApi = GetAuthentificationString(uriApiName);
                 api = ApiRest.GetInstance(uriApi, authenticationString);
             }
             catch (Exception e)
@@ -76,16 +80,33 @@ namespace MediaTekDocuments.dal
         }
 
         /// <summary>
-        /// 
+        /// Récupération de la chaîne de connexion
         /// </summary>
-        /// <param name="mail"></param>
-        /// <param name="hash"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public Utilisateur GetLogin(string mail, string hash)
+        static string GetAuthentificationString(string name)
         {
-            Dictionary<string, string> login = new Dictionary<string, string>();
-            login.Add("mail", mail);
-            login.Add("password", hash);
+            string returnValue = null;
+            ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[name];
+            if (settings != null)
+                returnValue = settings.ConnectionString;
+            return returnValue;
+        }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mail"></param>
+    /// <param name="hash"></param>
+    /// <returns></returns>
+    public Utilisateur GetLogin(string mail, string hash)
+        {
+            Dictionary<string, string> login = new Dictionary<string, string>
+            {
+                { "mail", mail },
+                { "password", hash }
+            };
             String mailHash = JsonConvert.SerializeObject(login);
             List<Utilisateur> utilisateurs = TraitementRecup<Utilisateur>(GET, "utilisateur/" + mailHash);
             if (utilisateurs.Count > 0)
@@ -243,7 +264,7 @@ namespace MediaTekDocuments.dal
         /// <returns>Liste d'objets Exemplaire</returns>
         public List<Exemplaire> GetExemplairesRevue(string idDocument)
         {
-            String jsonIdDocument = convertToJson("id", idDocument);
+            String jsonIdDocument = ConvertToJson("id", idDocument);
             List<Exemplaire> lesExemplaires = TraitementRecup<Exemplaire>(GET, "exemplaire/" + jsonIdDocument);
             return lesExemplaires;
         }
@@ -255,7 +276,7 @@ namespace MediaTekDocuments.dal
         /// <returns></returns>
         public List<CommandeDocument> GetCommandesLivres(string idLivre)
         {
-            String jsonIdDocument = convertToJson("idLivreDvd", idLivre);
+            String jsonIdDocument = ConvertToJson("idLivreDvd", idLivre);
             List<CommandeDocument> lesCommandesLivres = TraitementRecup<CommandeDocument>(GET, "commandedocument/" + jsonIdDocument);
             return lesCommandesLivres;
         }
@@ -267,7 +288,7 @@ namespace MediaTekDocuments.dal
         /// <returns></returns>
         public List<Abonnement> GetAbonnements(string idRevue)
         {
-            String jsonAbonnementIdRevue = convertToJson("idRevue", idRevue);
+            String jsonAbonnementIdRevue = ConvertToJson("idRevue", idRevue);
             List<Abonnement> abonnements =  TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
             return abonnements;
         }
@@ -278,7 +299,7 @@ namespace MediaTekDocuments.dal
         /// </summary>
         /// <param name="maxIndex"></param>
         /// <returns></returns>
-        public string getMaxIndex(string maxIndex)
+        public string GetMaxIndex(string maxIndex)
         {
             List<Categorie> maxindex = TraitementRecup<Categorie>(GET, maxIndex);
             return maxindex[0].Id;
@@ -348,10 +369,12 @@ namespace MediaTekDocuments.dal
         /// <param name="nom"></param>
         /// <param name="valeur"></param>
         /// <returns>couple au format json</returns>
-        private String convertToJson(Object nom, Object valeur)
+        private String ConvertToJson(Object nom, Object valeur)
         {
-            Dictionary<Object, Object> dictionary = new Dictionary<Object, Object>();
-            dictionary.Add(nom, valeur);
+            Dictionary<Object, Object> dictionary = new Dictionary<Object, Object>
+            {
+                { nom, valeur }
+            };
             return JsonConvert.SerializeObject(dictionary);
         }
 
