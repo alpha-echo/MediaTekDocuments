@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediaTekDocuments.dal;
 using MediaTekDocuments.model;
-using MediaTekDocuments.dal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 
 namespace MediaTekDocuments.controller
 {
@@ -97,7 +96,7 @@ namespace MediaTekDocuments.controller
         public bool VerifDroitModif(Utilisateur utilisateur)
         {
             //Console.WriteLine(utilisateur.Nom);
-            List<string> services = new List<string> {"biblio", "accueil" };
+            List<string> services = new List<string> { "biblio", "accueil" };
             if (services.Contains(utilisateur.Service.Libelle))
                 return true;
             return false;
@@ -111,7 +110,7 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool VerifCommande(Utilisateur utilisateur)
         {
-            List<string> services = new List<string> {"biblio" };
+            List<string> services = new List<string> { "biblio" };
             if (services.Contains(utilisateur.Service.Libelle))
                 return true;
             return false;
@@ -351,7 +350,7 @@ namespace MediaTekDocuments.controller
         {
             return access.CreerEntite("commandedocument", JsonConvert.SerializeObject(commandeLivreDvd, new CustomDateTimeConverter()));
         }
-        
+
         /// <summary>
         /// Modifie une commande livre/Dvd dans la bdd
         /// </summary>
@@ -392,7 +391,7 @@ namespace MediaTekDocuments.controller
         /// <returns></returns>
         public bool CreerAbonnement(Abonnement abonnement)
         {
-            return access.CreerEntite("abonnement", JsonConvert.SerializeObject(abonnement,  new CustomDateTimeConverter()));
+            return access.CreerEntite("abonnement", JsonConvert.SerializeObject(abonnement, new CustomDateTimeConverter()));
         }
 
         /// <summary>

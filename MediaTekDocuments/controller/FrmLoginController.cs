@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediaTekDocuments.dal;
 using MediaTekDocuments.model;
-using MediaTekDocuments.dal;
+using MediaTekDocuments.view;
 using System.Security.Cryptography;
 using System.Text;
-using MediaTekDocuments.view;
-using System.Windows.Forms;
 
 namespace MediaTekDocuments.controller
 {
@@ -48,7 +45,7 @@ namespace MediaTekDocuments.controller
             string hash = "";
             using (SHA256 sha256Hash = SHA256.Create())
             {
-                 hash = GetHash(sha256Hash, password);
+                hash = GetHash(sha256Hash, password);
             }
             utilisateur = access.GetLogin(mail, hash);
             if (utilisateur != null)

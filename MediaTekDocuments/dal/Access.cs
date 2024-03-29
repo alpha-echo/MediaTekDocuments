@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediaTekDocuments.manager;
 using MediaTekDocuments.model;
-using MediaTekDocuments.manager;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using System.Configuration;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace MediaTekDocuments.dal
 {
@@ -61,9 +61,9 @@ namespace MediaTekDocuments.dal
                     .WriteTo.Console()
                     .WriteTo.File("logs/log.txt")
                     .CreateLogger();
-               String authenticationString = GetAuthentificationString(authenticationName);
-               String uriApi = GetAuthentificationString(uriApiName);
-               api = ApiRest.GetInstance(uriApi, authenticationString);
+                String authenticationString = GetAuthentificationString(authenticationName);
+                String uriApi = GetAuthentificationString(uriApiName);
+                api = ApiRest.GetInstance(uriApi, authenticationString);
             }
             catch (Exception e)
             {
@@ -79,7 +79,7 @@ namespace MediaTekDocuments.dal
         /// <returns>instance unique de la classe</returns>
         public static Access GetInstance()
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = new Access();
             }
@@ -101,13 +101,13 @@ namespace MediaTekDocuments.dal
         }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="mail"></param>
-    /// <param name="hash"></param>
-    /// <returns></returns>
-    public Utilisateur GetLogin(string mail, string hash)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mail"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public Utilisateur GetLogin(string mail, string hash)
         {
             Dictionary<string, string> login = new Dictionary<string, string>
             {
@@ -300,7 +300,7 @@ namespace MediaTekDocuments.dal
         public List<Abonnement> GetAbonnements(string idRevue)
         {
             String jsonAbonnementIdRevue = ConvertToJson("idRevue", idRevue);
-            List<Abonnement> abonnements =  TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
+            List<Abonnement> abonnements = TraitementRecup<Abonnement>(GET, "abonnements/" + jsonAbonnementIdRevue);
             return abonnements;
         }
 
@@ -324,7 +324,8 @@ namespace MediaTekDocuments.dal
         public bool CreerExemplaire(Exemplaire exemplaire)
         {
             String jsonExemplaire = JsonConvert.SerializeObject(exemplaire, new CustomDateTimeConverter());
-            try {
+            try
+            {
                 // récupération soit d'une liste vide (requête ok) soit de null (erreur)
                 List<Exemplaire> liste = TraitementRecup<Exemplaire>(POST, "exemplaire/" + jsonExemplaire);
                 return (liste != null);
@@ -334,7 +335,7 @@ namespace MediaTekDocuments.dal
                 Log.Error("Access.CreerExemplaire catch type erreur={0} champs={1}", ex, jsonExemplaire);
                 Console.WriteLine(ex.Message);
             }
-            return false; 
+            return false;
         }
 
         /// <summary>
@@ -344,7 +345,7 @@ namespace MediaTekDocuments.dal
         /// <param name="methode">verbe HTTP (GET, POST, PUT, DELETE)</param>
         /// <param name="message">information envoyée</param>
         /// <returns>liste d'objets récupérés (ou liste vide)</returns>
-        private List<T> TraitementRecup<T> (String methode, String message)
+        private List<T> TraitementRecup<T>(String methode, String message)
         {
             List<T> liste = new List<T>();
             try
@@ -368,9 +369,10 @@ namespace MediaTekDocuments.dal
                     Console.WriteLine("code erreur = " + code + " message = " + (String)retour["message"]);
                     Log.Error("Access.TraitementRecup code erreur = " + code + " message = " + (String)retour["message"]);
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
-                Console.WriteLine("Erreur lors de l'accès à l'API : "+e.Message);
+                Console.WriteLine("Erreur lors de l'accès à l'API : " + e.Message);
                 Log.Fatal("Erreur lors de l'accès à l'API : " + e.Message);
                 Environment.Exit(0);
             }

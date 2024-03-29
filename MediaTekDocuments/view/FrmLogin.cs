@@ -1,5 +1,5 @@
-﻿using System;
-using MediaTekDocuments.controller;
+﻿using MediaTekDocuments.controller;
+using System;
 using System.Windows.Forms;
 
 namespace MediaTekDocuments.view
