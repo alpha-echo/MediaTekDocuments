@@ -10,7 +10,7 @@ namespace MediaTekDocuments.model
         public string IdRevue { get; }
 
         public Abonnement(string id, DateTime dateCommande, double montant, DateTime dateFinAbonnement, string idRevue)
-            : base (id, dateCommande, montant)
+            : base(id, dateCommande, montant)
         {
             DateFinAbonnement = dateFinAbonnement;
             IdRevue = idRevue;

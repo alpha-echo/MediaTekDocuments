@@ -18,14 +18,12 @@ namespace MediaTekDocuments.model
             this.Nom = nom;
             this.Prenom = prenom;
             this.Mail = mail;
-            this.IdService = idService;
-            this.Service = service;
+            this.Service = new Service(idService, service);
         }
         public string Id { get; }
         public string Nom { get; set; }
         public string Prenom { get; set; }
         public string Mail { get; set; }
-        public string IdService { get; set; }
-        public string Service { get; set; }
+        public Service Service { get; }
     }
 }
